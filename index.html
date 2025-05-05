@@ -1,47 +1,53 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <title>Kinescope Embed</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="utf-8" />
+  <title>Kinescope Embed with Watermark</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
     html, body {
       margin: 0;
       padding: 0;
       height: 100%;
     }
-    #player {
+    /* Responsive 16:9 container */
+    #player-container {
       position: relative;
       padding-bottom: 56.25%; /* 16:9 ratio */
       height: 0;
       overflow: hidden;
     }
+    /* This is where the Kinescope player will go */
     #kinescope-player {
       position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
     }
   </style>
 </head>
 <body>
 
-  <div id="player">
+  <div id="player-container">
     <div id="kinescope-player"></div>
   </div>
 
   <script>
-    const params = new URLSearchParams(window.location.search);
+    // 1) Grab the video ID from ?video=...
+    const params  = new URLSearchParams(window.location.search);
     const videoId = params.get('video');
 
     if (!videoId) {
-      document.body.innerHTML = '<p style="padding:1em;">No video specified.</p>';
+      // No video → show message
+      document.body.innerHTML = 
+        '<p style="padding:1em; text-align:center;">No video specified.<br>' +
+        'Use ?video=YOUR_VIDEO_ID in the URL.</p>';
     } else {
+      // 2) Load the Kinescope iframe.player.js API
       const script = document.createElement('script');
       script.src = 'https://player.kinescope.io/latest/iframe.player.js';
-      script.onload = function () {
+      script.onload = () => {
         if (window.KinescopePlayer && typeof window.KinescopePlayer.create === 'function') {
+          // 3) Initialize the player with watermark
           window.KinescopePlayer.create('kinescope-player', {
             url: 'https://kinescope.io/embed/' + encodeURIComponent(videoId),
             size: { width: '100%', height: '100%' },
@@ -50,14 +56,18 @@
               mainPlayButton: true,
               watermark: {
                 enabled: true,
-                text: '© 2025 TheUnknownStudent. All rights reserved.'
+                text: '© 2025 BankWiseTrading. All rights reserved.'
               }
             }
-          }).then(function (player) {
-            player.once(player.Events.Ready, function () {
-              console.log('Player is ready');
+          }).then(player => {
+            player.once(player.Events.Ready, () => {
+              console.log('Kinescope player is ready');
             });
+          }).catch(err => {
+            console.error('Failed to create Kinescope player:', err);
           });
+        } else {
+          console.error('KinescopePlayer API not found after script load.');
         }
       };
       document.head.appendChild(script);
