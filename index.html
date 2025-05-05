@@ -1,9 +1,69 @@
-<div style="position: relative; padding-top: 56.25%; width: 100%">
-  <iframe 
-    src="https://kinescope.io/embed/q5spiMkbo9Sjpn5CSzscWd?watermark=TheUnknownStudent"
-    allow="autoplay; fullscreen; picture-in-picture; encrypted-media; gyroscope; accelerometer; clipboard-write; screen-wake-lock;"
-    frameborder="0"
-    allowfullscreen
-    style="position: absolute; width: 100%; height: 100%; top: 0; left: 0;">
-  </iframe>
-</div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>K Embed</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+    }
+    #player {
+      position: relative;
+      padding-bottom: 56.25%; /* 16:9 aspect ratio */
+      height: 0;
+      overflow: hidden;
+    }
+    #kinescope-player {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%;
+      height: 100%;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="player">
+    <div id="kinescope-player"></div>
+  </div>
+
+  <script>
+    // Extract video ID from the URL
+    const params = new URLSearchParams(window.location.search);
+    const videoId = params.get('video');
+
+    if (!videoId) {
+      document.body.innerHTML = '<p style="padding:1em;">No video specified.</p>';
+    } else {
+      // Load the Kinescope player API
+      const script = document.createElement('script');
+      script.src = 'https://player.kinescope.io/latest/iframe.player.js';
+      script.onload = function () {
+        if (window.KinescopePlayer && typeof window.KinescopePlayer.create === 'function') {
+          window.KinescopePlayer.create('kinescope-player', {
+            url: 'https://kinescope.io/' + encodeURIComponent(videoId),
+            size: { width: '100%', height: '100%' },
+            ui: {
+              controls: true,
+              mainPlayButton: true,
+              watermark: {
+                enabled: true,
+                text: '© 2025 TheUnknownStudent. All rights reserved.'
+              }
+            }
+          }).then(function (player) {
+            player.once(player.Events.Ready, function () {
+              console.log('Player is ready');
+            });
+          });
+        }
+      };
+      document.head.appendChild(script);
+    }
+  </script>
+
+</body>
+</html>
