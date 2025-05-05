@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>K Embed</title>
+  <title>Kinescope Embed</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
     html, body {
@@ -12,13 +12,14 @@
     }
     #player {
       position: relative;
-      padding-bottom: 56.25%; /* 16:9 aspect ratio */
+      padding-bottom: 56.25%; /* 16:9 ratio */
       height: 0;
       overflow: hidden;
     }
     #kinescope-player {
       position: absolute;
-      top: 0; left: 0;
+      top: 0;
+      left: 0;
       width: 100%;
       height: 100%;
     }
@@ -31,20 +32,18 @@
   </div>
 
   <script>
-    // Extract video ID from the URL
     const params = new URLSearchParams(window.location.search);
     const videoId = params.get('video');
 
     if (!videoId) {
       document.body.innerHTML = '<p style="padding:1em;">No video specified.</p>';
     } else {
-      // Load the Kinescope player API
       const script = document.createElement('script');
       script.src = 'https://player.kinescope.io/latest/iframe.player.js';
       script.onload = function () {
         if (window.KinescopePlayer && typeof window.KinescopePlayer.create === 'function') {
           window.KinescopePlayer.create('kinescope-player', {
-            url: 'https://kinescope.io/' + encodeURIComponent(videoId),
+            url: 'https://kinescope.io/embed/' + encodeURIComponent(videoId),
             size: { width: '100%', height: '100%' },
             ui: {
               controls: true,
