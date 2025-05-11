@@ -1,9 +1,48 @@
-<div style="position: relative; padding-top: 56.25%; width: 100%">
-  <iframe 
-    src="https://kinescope.io/embed/q5spiMkbo9Sjpn5CSzscWd?watermark=YOUR_WATERMARK_URL"
-    allow="autoplay; fullscreen; picture-in-picture; encrypted-media; gyroscope; accelerometer; clipboard-write; screen-wake-lock;"
-    frameborder="0"
-    allowfullscreen
-    style="position: absolute; width: 100%; height: 100%; top: 0; left: 0;">
-  </iframe>
-</div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>K Embed</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body, html { margin: 0; padding: 0; height: 100%; }
+    #player { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; }
+    #player iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
+    #message { padding: 1em; font-family: sans-serif; text-align: center; }
+  </style>
+</head>
+<body>
+  <div id="player"></div>
+  <div id="message" style="display:none;"></div>
+
+  <script>
+    // 1) grab ?video=ID
+    const params  = new URLSearchParams(window.location.search);
+    const videoId = params.get('video');
+
+    // 2) detect top-level vs embed
+    const isEmbedded = window.self !== window.top; 
+
+    // 3) handle missing ID
+    if (!videoId) {
+      document.getElementById('message')
+        .textContent = 'No video specified.'
+        .style.display = 'block';
+
+    // 4) if direct visit (not embedded), show notice instead of player
+    } else if (!isEmbedded) {
+      document.getElementById('message')
+        .textContent = 'Playback is only allowed when embedded on another site.'
+        .style.display = 'block';
+
+    // 5) if embedded, inject the Kinescope player
+    } else {
+      const iframe = document.createElement('iframe');
+      iframe.src             = 'https://kinescope.io/embed/' + encodeURIComponent(videoId);
+      iframe.allow           = 'autoplay; fullscreen; picture-in-picture; encrypted-media; gyroscope; accelerometer; clipboard-write; screen-wake-lock;';
+      iframe.allowFullscreen = true;
+      document.getElementById('player').appendChild(iframe);
+    }
+  </script>
+</body>
+</html>
